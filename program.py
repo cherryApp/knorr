@@ -100,7 +100,7 @@ root.geometry("800x600")
 
 # Label to display the selected file/folder path
 label_file_path = tk.Label(root, text="Lista fájl nincs kiválasztva!", font=("Arial", 14))
-label_file_path.pack(pady=3)
+label_file_path.grid(row=0, column=0, columnspan=2, padx=10, pady=10)
 
 def browse_file():
     global list_file
@@ -195,7 +195,7 @@ def read_txt_dir():
                 # változóban tárolt PID-t.
                 conti_az[row[3]].append(key)
     
-    columns = ("Device", "PN", "PID", "ContiAZ", "Success")
+    columns = ("Device", "PN", "PID", "ContiAZ", "ErrorCode")
               
     show_table(root, columns, data, height=8)
     
@@ -213,7 +213,7 @@ def show_table(parent, columns, data, height=8):
         tree.insert("", "end", values=row)
 
     # Add the Treeview widget to the parent
-    tree.pack(pady=20, padx=20)
+    tree.grid(row=2, column=0, columnspan=2, padx=10, pady=10)
 
     return tree
         
@@ -223,11 +223,11 @@ def show_table(parent, columns, data, height=8):
 # A lista fájl kiválasztása
 header =  tk.Label(root, text="Adja meg a lista fájl nevét: ", font=("Arial", 20))
 btn_browse_file = tk.Button(root, text="Lista Fájl", command=browse_file)
-btn_browse_file.pack(pady=5)
+btn_browse_file.grid(row=1, column=0, padx=5)
 
-# Button to browse folders
+# A mappa kiválasztása
 btn_browse_folder = tk.Button(root, text="Txt Mappa", command=read_txt_dir)
-btn_browse_folder.pack(pady=5)
+btn_browse_folder.grid(row=1, column=1, padx=5)
 
 # Run the tkinter main loop
 root.mainloop()
