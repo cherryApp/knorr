@@ -90,6 +90,7 @@ txt_file_list = []
 pid_dict = {}
 pid_list = []
 conti_az = {}
+root = None
 
 
 # Üres ablak létrehozása
@@ -135,6 +136,10 @@ def read_txt_dir():
     global txt_dir
     global txt_file_list
     global conti_az
+    global root
+    
+    # A táblázatban megjelenő adatok
+    data = []
     
     # Adott mappában található .txt fájlok beolvasása.
     txt_dir = filedialog.askdirectory(title="Adja meg a .txt fájlokat tartalmazó mappa nevét")
@@ -160,7 +165,9 @@ def read_txt_dir():
                 # A sor elején állhat: 0, 1, 103, 104
                 row = line.split('*')
                 if row[0] not in ['0', '1', '103', '104']:
-                    continue                
+                    continue 
+                  
+                data.append(row)               
 
                 # Az adatsor(row) harmadik eleme a PID, de elé kell írnunk mert a PID szöveget nem tartalmazza.
                 key = 'PID' + row[2]
@@ -187,16 +194,30 @@ def read_txt_dir():
                 # A cont_az, lista 4. elemében található nevű listájába betesszük a key
                 # változóban tárolt PID-t.
                 conti_az[row[3]].append(key)
-                
-    show_table()
     
-def show_table(data = []):
-    global root
-    columns = ("ID", "Name", "Age", "Department")
-    tree = ttk.Treeview(root, columns=columns, show="headings", height=8)
+    columns = ("Device", "PN", "PID", "ContiAZ", "Success")
+              
+    show_table(root, columns, data, height=8)
+    
+def show_table(parent, columns, data, height=8):
+    # Létrehozza a táblázatot
+    tree = ttk.Treeview(parent, columns=columns, show="headings", height=height)
+
+    # Létrehozza az oszlopokat a táblázatban
     for col in columns:
-        tree.heading(col, text=col)  # Set the heading
-        tree.column(col, anchor="center", width=100)
+        tree.heading(col, text=col)  # fejléc neve és szövege
+        tree.column(col, anchor="center", width=100)  # oszlop, középre igazított szöveggel és 100 széles
+
+    # Adatok beszúrása a táblázatba
+    for row in data:
+        tree.insert("", "end", values=row)
+
+    # Add the Treeview widget to the parent
+    tree.pack(pady=20, padx=20)
+
+    return tree
+        
+    
 
 
 # A lista fájl kiválasztása
