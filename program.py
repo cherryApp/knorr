@@ -93,6 +93,7 @@ conti_az = {}
 root = None
 table_data = []
 columns = ("Device", "PN", "PID", "ContiAZ", "ErrorCode")
+current_csv = ''
 
 
 # Üres ablak létrehozása
@@ -199,16 +200,18 @@ def read_txt_dir():
                 conti_az[row[3]].append(key)
     
     table_data = data       
-    show_table(root, columns, data, height=8)
+    show_table(root, columns, data)
     
-def show_table(parent, columns, data, height=8):
+def show_table(parent, columns, data, height=20):
+    global current_csv
+    
     # Létrehozza a táblázatot
     tree = ttk.Treeview(parent, columns=columns, show="headings", height=height)
 
     # Létrehozza az oszlopokat a táblázatban
     for col in columns:
         tree.heading(col, text=col)  # fejléc neve és szövege
-        tree.column(col, anchor="center", width=100)  # oszlop, középre igazított szöveggel és 100 széles
+        tree.column(col, anchor="center", width=200)  # oszlop, középre igazított szöveggel és 100 széles
 
     # Adatok beszúrása a táblázatba
     for row in data:
@@ -216,6 +219,11 @@ def show_table(parent, columns, data, height=8):
 
     # Add the Treeview widget to the parent
     tree.grid(row=3, column=0, columnspan=2, padx=10, pady=10)
+    
+    # CSV generálás
+    current_csv = ''
+    for row in data:
+      current_csv += ';'.join(row) + '\n'
 
     return tree
         
@@ -226,12 +234,18 @@ def filter_by_error_code():
     
     code = error_code_input.get()
     if code == "":
-        show_table(root, columns, table_data, height=8)
+        show_table(root, columns, table_data)
         return
     
     filtered_data = [row for row in table_data if row[4] == code]
-    show_table(root, columns, filtered_data, height=8)
+    show_table(root, columns, filtered_data)
     
+
+def save_data():
+    file_name = filedialog.asksaveasfile(mode='w', defaultextension=".csv")
+    file = open(file_name.name, 'w', encoding='utf-8')
+    file.write(current_csv)
+    file.close()
 
 # A lista fájl kiválasztása
 header =  tk.Label(root, text="Adja meg a lista fájl nevét: ", font=("Arial", 20))
@@ -247,6 +261,10 @@ error_code_input = tk.Entry(root, width=25, font=("Arial", 20))
 error_code_input.grid(row=2, column=0, padx=10, pady=10)
 error_code_btn = tk.Button(root, text="Szűrés hibakódra", command=filter_by_error_code)
 error_code_btn.grid(row=2, column=1, padx=10, pady=10)
+
+# Táblázatos adatok mentése
+btn_save_data = tk.Button(root, text="Mentés CSV fájlba", command=save_data)
+btn_save_data.grid(row=4, column=0, padx=10, pady=10)
 
 # Run the tkinter main loop
 root.mainloop()
