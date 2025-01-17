@@ -91,6 +91,8 @@ pid_dict = {}
 pid_list = []
 conti_az = {}
 root = None
+table_data = []
+columns = ("Device", "PN", "PID", "ContiAZ", "ErrorCode")
 
 
 # Üres ablak létrehozása
@@ -137,6 +139,7 @@ def read_txt_dir():
     global txt_file_list
     global conti_az
     global root
+    global table_data
     
     # A táblázatban megjelenő adatok
     data = []
@@ -195,8 +198,7 @@ def read_txt_dir():
                 # változóban tárolt PID-t.
                 conti_az[row[3]].append(key)
     
-    columns = ("Device", "PN", "PID", "ContiAZ", "ErrorCode")
-              
+    table_data = data       
     show_table(root, columns, data, height=8)
     
 def show_table(parent, columns, data, height=8):
@@ -213,12 +215,23 @@ def show_table(parent, columns, data, height=8):
         tree.insert("", "end", values=row)
 
     # Add the Treeview widget to the parent
-    tree.grid(row=2, column=0, columnspan=2, padx=10, pady=10)
+    tree.grid(row=3, column=0, columnspan=2, padx=10, pady=10)
 
     return tree
         
     
-
+def filter_by_error_code():
+    global table_data
+    global root
+    
+    code = error_code_input.get()
+    if code == "":
+        show_table(root, columns, table_data, height=8)
+        return
+    
+    filtered_data = [row for row in table_data if row[4] == code]
+    show_table(root, columns, filtered_data, height=8)
+    
 
 # A lista fájl kiválasztása
 header =  tk.Label(root, text="Adja meg a lista fájl nevét: ", font=("Arial", 20))
@@ -228,6 +241,12 @@ btn_browse_file.grid(row=1, column=0, padx=5)
 # A mappa kiválasztása
 btn_browse_folder = tk.Button(root, text="Txt Mappa", command=read_txt_dir)
 btn_browse_folder.grid(row=1, column=1, padx=5)
+
+# Szűrés hibakódra
+error_code_input = tk.Entry(root, width=25, font=("Arial", 20))
+error_code_input.grid(row=2, column=0, padx=10, pady=10)
+error_code_btn = tk.Button(root, text="Szűrés hibakódra", command=filter_by_error_code)
+error_code_btn.grid(row=2, column=1, padx=10, pady=10)
 
 # Run the tkinter main loop
 root.mainloop()
